@@ -1,0 +1,98 @@
+{
+  "best_model_name": "logistic_regression_calibrated",
+  "feature_columns": [
+    "total_events",
+    "total_views",
+    "total_addtocart",
+    "add_to_view_ratio",
+    "activity_level",
+    "total_sessions",
+    "click_rate",
+    "session_duration",
+    "pages_per_session",
+    "time_since_last_activity",
+    "active_days",
+    "cart_to_view_rate",
+    "avg_events_per_session"
+  ],
+  "evaluations": [
+    {
+      "model_name": "logistic_regression_calibrated",
+      "precision": 0.9844961240310077,
+      "recall": 0.9921875,
+      "f1_score": 0.9883268482490273,
+      "confusion_matrix": [
+        [
+          31682,
+          4
+        ],
+        [
+          2,
+          254
+        ]
+      ]
+    },
+    {
+      "model_name": "random_forest",
+      "precision": 0.5032119914346895,
+      "recall": 0.91796875,
+      "f1_score": 0.6500691562932227,
+      "confusion_matrix": [
+        [
+          31454,
+          232
+        ],
+        [
+          21,
+          235
+        ]
+      ]
+    }
+  ],
+  "error_analysis": {
+    "logistic_regression_calibrated": {
+      "false_positive_count": 4,
+      "false_negative_count": 2,
+      "false_positive_avg_click_rate": 0.25,
+      "false_negative_avg_click_rate": 0.0,
+      "false_positive_avg_pages_per_session": 12.75,
+      "false_negative_avg_pages_per_session": 2.0
+    },
+    "random_forest": {
+      "false_positive_count": 232,
+      "false_negative_count": 21,
+      "false_positive_avg_click_rate": 0.16575819746963996,
+      "false_negative_avg_click_rate": 0.06666666666666667,
+      "false_positive_avg_pages_per_session": 3.32967655217782,
+      "false_negative_avg_pages_per_session": 1.5634920634920637
+    }
+  },
+  "decision_threshold": 0.6,
+  "logistic_feature_importance": [
+    {
+      "feature": "total_views",
+      "coefficient": -43.002009075973625,
+      "abs_coefficient": 43.002009075973625
+    },
+    {
+      "feature": "total_events",
+      "coefficient": 24.076095744445066,
+      "abs_coefficient": 24.076095744445066
+    },
+    {
+      "feature": "activity_level",
+      "coefficient": 24.076095744445066,
+      "abs_coefficient": 24.076095744445066
+    },
+    {
+      "feature": "total_addtocart",
+      "coefficient": -5.00198427172376,
+      "abs_coefficient": 5.00198427172376
+    },
+    {
+      "feature": "pages_per_session",
+      "coefficient": -0.9071720191569997,
+      "abs_coefficient": 0.9071720191569997
+    }
+  ]
+}
