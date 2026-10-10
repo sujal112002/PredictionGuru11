@@ -17,12 +17,10 @@ class UserFeaturesInput(BaseModel):
     total_views: float = Field(ge=0)
     total_addtocart: float = Field(ge=0)
     add_to_view_ratio: float = Field(ge=0)
-    activity_level: float = Field(ge=0)
     total_sessions: float = Field(ge=1)
     click_rate: float = Field(ge=0)
     session_duration: float = Field(ge=0)
     pages_per_session: float = Field(ge=0)
-    time_since_last_activity: float = Field(ge=0)
     active_days: float = Field(ge=0)
     cart_to_view_rate: float = Field(ge=0)
     avg_events_per_session: float = Field(ge=0)
@@ -63,10 +61,9 @@ def build_prediction_reason(user_features: UserFeaturesInput, prediction: int) -
     # Positive signals
     high_intent = user_features.add_to_view_ratio >= 0.25
     high_engagement = user_features.session_duration >= 100
-    recent_activity = user_features.time_since_last_activity <= 30
 
     # Negative signals
-    low_activity = user_features.activity_level <= 3
+    low_activity = user_features.total_events <= 3
     no_cart = user_features.total_addtocart == 0
 
     if prediction == 1:
@@ -74,8 +71,6 @@ def build_prediction_reason(user_features: UserFeaturesInput, prediction: int) -
             return "Likely to convert due to strong add-to-cart activity"
         if high_engagement:
             return "Likely to convert due to high session engagement"
-        if recent_activity:
-            return "Likely to convert due to recent user activity"
         return "Likely to convert based on overall behavioral patterns"
 
     else:

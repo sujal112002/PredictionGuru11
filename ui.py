@@ -6,52 +6,47 @@ API_URL = "http://127.0.0.1:8000/predict"
 
 
 def compute_derived_features(
-    total_events: int,
     total_views: int,
     total_addtocart: int,
     total_sessions: int,
 ) -> dict:
-    """Keep feature math consistent with training assumptions."""
-    add_to_view_ratio = total_addtocart / (total_views + 1)
-    click_rate = total_addtocart / (total_events + 1)
-    activity_level = total_events
+    """Keep feature math consistent with src/features.py."""
+    # Transactions are excluded from training features, so events are views plus add-to-carts.
+    total_events = total_views + total_addtocart
+    add_to_view_ratio = total_addtocart / max(total_views, 1)
+    click_rate = total_addtocart / max(total_events, 1)
     cart_to_view_rate = add_to_view_ratio
     avg_events_per_session = total_events / max(total_sessions, 1)
 
     return {
+        "total_events": total_events,
         "add_to_view_ratio": add_to_view_ratio,
         "click_rate": click_rate,
-        "activity_level": activity_level,
         "cart_to_view_rate": cart_to_view_rate,
         "avg_events_per_session": avg_events_per_session,
     }
 
 
 def build_payload(
-    total_events: int,
     total_views: int,
     total_addtocart: int,
     total_sessions: int,
     session_duration: float,
     pages_per_session: float,
-    time_since_last_activity: float,
     active_days: float,
 ) -> dict:
     derived_features = compute_derived_features(
-        total_events=total_events,
         total_views=total_views,
         total_addtocart=total_addtocart,
         total_sessions=total_sessions,
     )
 
     return {
-        "total_events": total_events,
         "total_views": total_views,
         "total_addtocart": total_addtocart,
         "total_sessions": total_sessions,
         "session_duration": session_duration,
         "pages_per_session": pages_per_session,
-        "time_since_last_activity": time_since_last_activity,
         "active_days": active_days,
         **derived_features,
     }
@@ -86,7 +81,6 @@ def main() -> None:
     left_column, right_column = st.columns(2)
 
     with left_column:
-        total_events = st.slider("Total Events", min_value=0, max_value=100, value=20, step=1)
         total_views = st.slider("Total Views", min_value=0, max_value=100, value=15, step=1)
         total_addtocart = st.slider("Total Add To Cart", min_value=0, max_value=50, value=4, step=1)
         total_sessions = st.slider("Total Sessions", min_value=1, max_value=30, value=5, step=1)
@@ -106,13 +100,6 @@ def main() -> None:
             value=4.0,
             step=0.1,
         )
-        time_since_last_activity = st.slider(
-            "Time Since Last Activity (hours)",
-            min_value=0.0,
-            max_value=720.0,
-            value=24.0,
-            step=1.0,
-        )
         active_days = st.slider(
             "Active Days",
             min_value=0.0,
@@ -122,22 +109,20 @@ def main() -> None:
         )
 
     payload = build_payload(
-        total_events=total_events,
         total_views=total_views,
         total_addtocart=total_addtocart,
         total_sessions=total_sessions,
         session_duration=session_duration,
         pages_per_session=pages_per_session,
-        time_since_last_activity=time_since_last_activity,
         active_days=active_days,
     )
 
     with st.expander("Derived Features", expanded=False):
         st.json(
             {
+                "total_events": payload["total_events"],
                 "add_to_view_ratio": round(payload["add_to_view_ratio"], 4),
                 "click_rate": round(payload["click_rate"], 4),
-                "activity_level": payload["activity_level"],
                 "cart_to_view_rate": round(payload["cart_to_view_rate"], 4),
                 "avg_events_per_session": round(payload["avg_events_per_session"], 4),
             }
